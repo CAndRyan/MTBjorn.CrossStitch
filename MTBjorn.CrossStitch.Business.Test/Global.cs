@@ -7,6 +7,9 @@ namespace MTBjorn.CrossStitch.Business.Test
 	internal static class Global
 	{
 		private const string resourcesDirectoryName = "Resources";
+		private const string testPngFileName = "egypticon-128x128.png";
+
+		public static string TestPngFilePath => GetResourcePath(testPngFileName);
 
 		public static string GetResourcePath(string resourceName)
 		{

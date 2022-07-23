@@ -7,7 +7,7 @@ namespace MTBjorn.CrossStitch.Business.Test
 	internal class GlobalTest
 	{
 		private const string resourcesDirectoryName = "Resources";
-		private const string testResourceFileName = "egypticon-128x128.png";
+		private const string testResourcePngFileName = "egypticon-128x128.png";
 
 		private static string AssemblyDirectory => Global.GetAssemblyDirectory();
 
@@ -21,8 +21,17 @@ namespace MTBjorn.CrossStitch.Business.Test
 		[Test]
 		public void GetResourcePath_FileExists_Returns_FullFilePath()
 		{
-			var result = Global.GetResourcePath(testResourceFileName);
-			var expectedResult = Path.Join(AssemblyDirectory, resourcesDirectoryName, testResourceFileName);
+			var result = Global.GetResourcePath(testResourcePngFileName);
+			var expectedResult = Path.Join(AssemblyDirectory, resourcesDirectoryName, testResourcePngFileName);
+
+			Assert.AreEqual(expectedResult, result);
+		}
+
+		[Test]
+		public void TestPngFilePath_Returns_FullFilePath()
+		{
+			var result = Global.TestPngFilePath;
+			var expectedResult = Path.Join(AssemblyDirectory, resourcesDirectoryName, testResourcePngFileName);
 
 			Assert.AreEqual(expectedResult, result);
 		}
