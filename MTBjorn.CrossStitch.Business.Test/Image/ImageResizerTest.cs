@@ -3,7 +3,7 @@ using NUnit.Framework;
 namespace MTBjorn.CrossStitch.Business.Test
 {
 	[TestFixture]
-	public class ImageParserTest
+	internal class ImageResizerTest
 	{
 		[SetUp]
 		public void Setup()
