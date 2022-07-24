@@ -23,10 +23,10 @@ namespace MTBjorn.CrossStitch.Business.Image
 			if (maxWidth < 0 || maxHeight < 0 || pointsPerInch <= 0)
 				throw new ArgumentException($"Invalid argument(s): {nameof(maxWidth)}={maxWidth}, {nameof(maxHeight)}={maxHeight}, {nameof(pointsPerInch)}={pointsPerInch}");
 
-			if (originalWidth <= originalHeight)
+			if (originalWidth > originalHeight)
 				return ((int)(maxWidth * pointsPerInch), 0);
 
-			return ((int)(maxHeight * pointsPerInch), 0);
+			return (0, (int)(maxHeight * pointsPerInch));
 		}
 
 		public static (int width, int height) GetPixelDimensions(IS.Image image, decimal maxWidth, decimal maxHeight, int pointsPerInch)

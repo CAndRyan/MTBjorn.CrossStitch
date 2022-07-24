@@ -62,5 +62,39 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 			Assert.AreEqual(expectedHeight, height);
 			Assert.AreEqual(0, width);
 		}
+
+		[Test]
+		public void GetPixelDimensions_WithAspectRatioSkewedHorizontal_ReturnsFromMaxWidth()
+		{
+			var originalWidth = 100;
+			var originalHeight = 80;
+			var maxWidth = 8.0m;
+			var maxHeight = 0m; // TODO: find way to detect which dimension should be zero...
+			var pointsPerInch = 14;
+
+			var (width, height) = AidaClothHelper.GetPixelDimensions(originalWidth, originalHeight, maxWidth, maxHeight, pointsPerInch);
+
+			var expectedWidth = (int)(maxWidth * pointsPerInch);
+			Assert.Greater(originalWidth, originalHeight, "Test setup does not have horizontally skewed aspect ratio");
+			Assert.AreEqual(expectedWidth, width);
+			Assert.AreEqual(0, height);
+		}
+
+		[Test]
+		public void GetPixelDimensions_WithAspectRatioSkewedVertical_ReturnsFromMaxHeight()
+		{
+			var originalWidth = 80;
+			var originalHeight = 100;
+			var maxWidth = 0m; // TODO: find way to detect which dimension should be zero...
+			var maxHeight = 8.0m;
+			var pointsPerInch = 14;
+
+			var (width, height) = AidaClothHelper.GetPixelDimensions(originalWidth, originalHeight, maxWidth, maxHeight, pointsPerInch);
+
+			var expectedHeight = (int)(maxHeight * pointsPerInch);
+			Assert.Greater(originalHeight, originalWidth, "Test setup does not have horizontally skewed aspect ratio");
+			Assert.AreEqual(expectedHeight, height);
+			Assert.AreEqual(0, width);
+		}
 	}
 }
