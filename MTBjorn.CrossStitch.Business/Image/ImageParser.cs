@@ -1,4 +1,7 @@
-﻿using IS = SixLabors.ImageSharp;
+﻿using SixLabors.ImageSharp.PixelFormats;
+using System.Collections.Generic;
+using System.Linq;
+using IS = SixLabors.ImageSharp;
 
 namespace MTBjorn.CrossStitch.Business.Image
 {
@@ -6,6 +9,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 	/// aaa
 	/// 1. Resize image to match pixel density of desired aida cloth size (i.e. height, width, pointsPerInch)
 	/// 2. Identify all pixel colors in image
+	/// 3. Build filter that reduces each pixel to the closest color (in a given color set)
 	/// 3. Normalize pixels to reduced color set
 	/// 4. ...
 	/// </summary>
@@ -30,19 +34,29 @@ namespace MTBjorn.CrossStitch.Business.Image
 
 		public void DO(string inputFilePath)
 		{
-			var resizedImage = Resize(inputFilePath);
+			var resizedImage = Resize<Rgba32>(inputFilePath);
 
 			// TODO: implement
+			var colors = GetAllColors(resizedImage).ToList();
 
-			ImageFileIO.Save(resizedImage, "D:\\chris\\downloads\\crossStitchExample.png");
+			//ImageFileIO.Save(resizedImage, "D:\\chris\\downloads\\crossStitchExample.png");
 		}
 
-		private IS.Image Resize(string inputFilePath)
+		private IEnumerable<TPixel> GetAllColors<TPixel>(IS.Image<TPixel> image) where TPixel : unmanaged, IPixel<TPixel>
 		{
-			var image = ImageFileIO.LoadImage(inputFilePath);
+			for (var rowIndex = 0; rowIndex < image.Height; rowIndex++)
+				for (var columnIndex = 0; columnIndex < image.Width; columnIndex++)
+					yield return image[rowIndex, columnIndex];
+		}
+
+		private IS.Image<TPixel> Resize<TPixel>(string inputFilePath) where TPixel : unmanaged, IPixel<TPixel>
+		{
+			var image = ImageFileIO.LoadImage<TPixel>(inputFilePath);
 			var (width, height) = AidaClothHelper.GetPixelDimensions(image, maxWidth, maxHeight, pointsPerInch);
 
-			return ImageResizer.Resize(image, width, height);
+			ImageResizer.Resize(image, width, height);
+
+			return image;
 		}
 	}
 }

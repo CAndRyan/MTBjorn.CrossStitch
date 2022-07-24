@@ -2,6 +2,7 @@
 using System.IO;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
 using IS = SixLabors.ImageSharp;
 
 namespace MTBjorn.CrossStitch.Business.Image
@@ -22,6 +23,15 @@ namespace MTBjorn.CrossStitch.Business.Image
 		{
 			var fileStream = Load(filePath);
 			return IS.Image.Load(fileStream);
+		}
+
+		/// <summary>
+		/// Load an image using a specific pixel type. e.g. <see cref="Rgba32"/>
+		/// </summary>
+		public static IS.Image<TPixel> LoadImage<TPixel>(string filePath) where TPixel : unmanaged, IPixel<TPixel>
+		{
+			var fileStream = Load(filePath);
+			return IS.Image.Load<TPixel>(fileStream);
 		}
 
 		public static void Save(IS.Image image, string filePath)
