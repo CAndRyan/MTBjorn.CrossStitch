@@ -17,7 +17,7 @@ namespace MTBjorn.CrossStitch.Business.Test.Image
 		[Test]
 		public void Load_FileExists()
 		{
-			var result = ImageFileIO.Load(Global.TestPngFilePath);
+			using var result = ImageFileIO.Load(Global.TestPngFilePath);
 
 			Assert.IsNotNull(result);
 		}
@@ -25,7 +25,7 @@ namespace MTBjorn.CrossStitch.Business.Test.Image
 		[Test]
 		public void LoadImage_FileExists()
 		{
-			var result = ImageFileIO.Load(Global.TestPngFilePath);
+			using var result = ImageFileIO.Load(Global.TestPngFilePath);
 
 			Assert.IsNotNull(result);
 		}
@@ -33,7 +33,7 @@ namespace MTBjorn.CrossStitch.Business.Test.Image
 		//[Test]
 		//public void Save_TEST()
 		//{
-		//	var resizedImage = ImageResizer.Resize(Global.TestPngFilePath, 64, 64);
+		//	using var resizedImage = ImageResizer.Resize(Global.TestPngFilePath, 64, 64);
 		//	ImageFileIO.Save(resizedImage, "D:\\chris\\downloads\\filePathTest.png");
 		//}
 	}

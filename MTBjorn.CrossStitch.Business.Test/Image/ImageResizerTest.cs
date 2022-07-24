@@ -12,7 +12,7 @@ namespace MTBjorn.CrossStitch.Business.Test
 		[TestCase(100, 50)]
 		public void Resize_WithStream_ExplicitWidthAndHeight_SetsOutputStreamWithModifiedData(int width, int height)
 		{
-			var inputStream = File.OpenRead(Global.TestPngFilePath);
+			using var inputStream = File.OpenRead(Global.TestPngFilePath);
 
 			var result = ImageResizer.Resize(inputStream, width, height);
 
@@ -25,7 +25,7 @@ namespace MTBjorn.CrossStitch.Business.Test
 		[TestCase(100, 50)]
 		public void Resize_WithFilePath_ExplicitWidthAndHeight_SetsOutputStreamWithModifiedData(int width, int height)
 		{
-			var result = ImageResizer.Resize(Global.TestPngFilePath, width, height);
+			using var result = ImageResizer.Resize(Global.TestPngFilePath, width, height);
 
 			Assert.AreEqual(width, result.Width);
 			Assert.AreEqual(height, result.Height);
@@ -37,7 +37,7 @@ namespace MTBjorn.CrossStitch.Business.Test
 			var height = 64;
 			var expectedAspectRatio = 1.0m;
 
-			var result = ImageResizer.Resize(Global.TestPngFilePath, 0, height);
+			using var result = ImageResizer.Resize(Global.TestPngFilePath, 0, height);
 
 			Assert.AreEqual((int)(height * expectedAspectRatio), result.Width);
 			Assert.AreEqual(height, result.Height);
@@ -49,7 +49,7 @@ namespace MTBjorn.CrossStitch.Business.Test
 			var width = 64;
 			var expectedAspectRatio = 1.0m;
 
-			var result = ImageResizer.Resize(Global.TestPngFilePath, width, 0);
+			using var result = ImageResizer.Resize(Global.TestPngFilePath, width, 0);
 
 			Assert.AreEqual((int)(width * expectedAspectRatio), result.Height);
 			Assert.AreEqual(width, result.Width);

@@ -8,8 +8,12 @@ namespace MTBjorn.CrossStitch.Business.Test
 	{
 		private const string resourcesDirectoryName = "Resources";
 		private const string testPngFileName = "egypticon-128x128.png";
+		private const string testSolidRedPngFileName = "solid-red-10x10.png";
+		private const string testHalfRedBluePngFileName = "half-red-blue-10x10.png";
 
 		public static string TestPngFilePath => GetResourcePath(testPngFileName);
+		public static string TestSolidRedPngFilePath => GetResourcePath(testSolidRedPngFileName);
+		public static string TestHalfRedBluePngFilePath => GetResourcePath(testHalfRedBluePngFileName);
 
 		public static string GetResourcePath(string resourceName)
 		{

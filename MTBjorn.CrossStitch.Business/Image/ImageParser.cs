@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp.PixelFormats;
+﻿using MTBjorn.CrossStitch.Business.Helpers;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Generic;
 using System.Linq;
 using IS = SixLabors.ImageSharp;
@@ -34,22 +35,15 @@ namespace MTBjorn.CrossStitch.Business.Image
 
 		public void DO(string inputFilePath)
 		{
-			var resizedImage = Resize<Rgba32>(inputFilePath);
+			var resizedImage = ResizeToClothDimensions<Rgb24>(inputFilePath);
 
 			// TODO: implement
-			var colors = GetAllColors(resizedImage).ToList();
+			var colors = ImageColorHelper.GetAllColors(resizedImage);
 
 			//ImageFileIO.Save(resizedImage, "D:\\chris\\downloads\\crossStitchExample.png");
 		}
 
-		private IEnumerable<TPixel> GetAllColors<TPixel>(IS.Image<TPixel> image) where TPixel : unmanaged, IPixel<TPixel>
-		{
-			for (var rowIndex = 0; rowIndex < image.Height; rowIndex++)
-				for (var columnIndex = 0; columnIndex < image.Width; columnIndex++)
-					yield return image[rowIndex, columnIndex];
-		}
-
-		private IS.Image<TPixel> Resize<TPixel>(string inputFilePath) where TPixel : unmanaged, IPixel<TPixel>
+		private IS.Image<TPixel> ResizeToClothDimensions<TPixel>(string inputFilePath) where TPixel : unmanaged, IPixel<TPixel>
 		{
 			var image = ImageFileIO.LoadImage<TPixel>(inputFilePath);
 			var (width, height) = AidaClothHelper.GetPixelDimensions(image, maxWidth, maxHeight, pointsPerInch);
