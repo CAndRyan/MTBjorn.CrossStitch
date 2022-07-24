@@ -18,7 +18,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 
 			var image = IS.Image.Load(inputStream);
 
-			return Resize(image, width, height);
+			return ResizeImage(image, width, height);
 		}
 
 		/// <summary>
@@ -32,10 +32,22 @@ namespace MTBjorn.CrossStitch.Business.Image
 
 			var image = ImageFileIO.LoadImage(inputFilePath);
 
-			return Resize(image, width, height);
+			return ResizeImage(image, width, height);
 		}
 
-		private static IS.Image Resize(IS.Image image, int width, int height)
+		/// <summary>
+		/// Resize an image using the default, <see href="https://docs.sixlabors.com/api/ImageSharp/SixLabors.ImageSharp.Processing.KnownResamplers.html#SixLabors_ImageSharp_Processing_KnownResamplers_Bicubic">Bicubic</see>, sampling algorithm.
+		/// If either height or width is 0, the other dimension will be calculated to preserve the input aspect ratio.
+		/// </summary>
+		public static IS.Image Resize(IS.Image image, int width = 0, int height = 0)
+		{
+			if (image is null)
+				throw new ArgumentNullException(nameof(image));
+
+			return ResizeImage(image, width, height);
+		}
+
+		private static IS.Image ResizeImage(IS.Image image, int width, int height)
 		{
 			if (width == 0 && height == 0)
 				return image;
