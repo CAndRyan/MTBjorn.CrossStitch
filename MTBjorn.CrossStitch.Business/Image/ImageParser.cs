@@ -1,8 +1,4 @@
-﻿using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Processing;
-using System;
-using System.IO;
-using IS = SixLabors.ImageSharp;
+﻿using IS = SixLabors.ImageSharp;
 
 namespace MTBjorn.CrossStitch.Business.Image
 {
@@ -15,11 +11,17 @@ namespace MTBjorn.CrossStitch.Business.Image
 	/// </summary>
 	public class ImageParser
 	{
-		private readonly int maxWidth;
-		private readonly int maxHeight;
+		private readonly decimal maxWidth;
+		private readonly decimal maxHeight;
 		private readonly int pointsPerInch;
 
-		public ImageParser(int maxHeight, int maxWidth, int pointsPerInch)
+		/// <summary>
+		// A helper to load an image & resize according to desired Aida cloth dimensions
+		/// </summary>
+		/// <param name="maxHeight">Max canvas height in inches</param>
+		/// <param name="maxWidth">Max canvas width in inches</param>
+		/// <param name="pointsPerInch">Points/pixels per inch of fabric</param>
+		public ImageParser(decimal maxHeight, decimal maxWidth, int pointsPerInch)
 		{
 			this.maxHeight = maxHeight;
 			this.maxWidth = maxWidth;
@@ -31,19 +33,16 @@ namespace MTBjorn.CrossStitch.Business.Image
 			var resizedImage = Resize(inputFilePath);
 
 			// TODO: implement
+
+			ImageFileIO.Save(resizedImage, "D:\\chris\\downloads\\crossStitchExample.png");
 		}
 
 		private IS.Image Resize(string inputFilePath)
 		{
 			var image = ImageFileIO.LoadImage(inputFilePath);
-			var (width, height) = GetResizeDimensions(image.Width, image.Height);
+			var (width, height) = AidaClothHelper.GetPixelDimensions(image, maxWidth, maxHeight, pointsPerInch);
 
 			return ImageResizer.Resize(image, width, height);
-		}
-
-		private (int width, int height) GetResizeDimensions(int originalWidth, int originalHeight)
-		{
-			return (0, 0);
 		}
 	}
 }
