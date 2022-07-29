@@ -27,6 +27,17 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 					new Rgb24(255, 0, 0),
 					new Rgb24(0, 0, 255)
 				}
+			},
+			new object[]
+			{
+				Global.TestQuadColorPngFilePath,
+				new Rgb24[]
+				{
+					new Rgb24(255, 0, 0),
+					new Rgb24(255, 128, 0),
+					new Rgb24(0, 0, 255),
+					new Rgb24(0, 255, 0)
+				}
 			}
 		};
 
@@ -38,6 +49,15 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 			var result = ImageColorHelper.GetAllColors(image);
 
 			CollectionAssert.AreEquivalent(colors, result);
+		}
+
+		[Test]
+		public void TEST()
+		{
+			using var image = ImageFileIO.LoadImage<Rgb24>(Global.TestHalfRedBluePngFilePath);
+			var colors = ImageColorHelper.GetAllColors(image);
+
+			var result = ImageColorHelper.GetReducedColorSet(colors, 1);
 		}
 	}
 }

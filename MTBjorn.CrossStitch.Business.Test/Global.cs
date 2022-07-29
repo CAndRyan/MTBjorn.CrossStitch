@@ -10,10 +10,12 @@ namespace MTBjorn.CrossStitch.Business.Test
 		private const string testPngFileName = "egypticon-128x128.png";
 		private const string testSolidRedPngFileName = "solid-red-10x10.png";
 		private const string testHalfRedBluePngFileName = "half-red-blue-10x10.png";
+		private const string testQuadColorPngFileName = "quarter-red-orange-blue-green-20x10.png";
 
 		public static string TestPngFilePath => GetResourcePath(testPngFileName);
 		public static string TestSolidRedPngFilePath => GetResourcePath(testSolidRedPngFileName);
 		public static string TestHalfRedBluePngFilePath => GetResourcePath(testHalfRedBluePngFileName);
+		public static string TestQuadColorPngFilePath => GetResourcePath(testQuadColorPngFileName);
 
 		public static string GetResourcePath(string resourceName)
 		{
