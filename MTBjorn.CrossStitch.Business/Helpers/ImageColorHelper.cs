@@ -51,6 +51,8 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		{
 			if (reducedColorCount <= 0)
 				return null;
+			if (reducedColorCount >= pixels.Count)
+				return pixels;
 			if (reducedColorCount == 1)
 				return new List<Rgb24> {
 					GetCentroid(pixels)
