@@ -104,7 +104,7 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		}
 
 		[Test]
-		public void GetReducedColorSet_TEST()
+		public void GetReducedColorSet_4Colors_2Reduced_ReturnsCentroidOfSubGroups()
 		{
 			using var image = ImageFileIO.LoadImage<Rgb24>(Global.TestQuadColorPngFilePath);
 			var colors = ImageColorHelper.GetAllColors(image);

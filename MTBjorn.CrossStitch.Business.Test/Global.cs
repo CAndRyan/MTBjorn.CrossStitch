@@ -12,12 +12,16 @@ namespace MTBjorn.CrossStitch.Business.Test
 		private const string testHalfRedBluePngFileName = "half-red-blue-10x10.png";
 		private const string testQuadColorPngFileName = "quarter-red-orange-blue-green-20x10.png";
 		private const string testQuadColorReduced2PngFileName = "quarter-red-orange-blue-green-20x10-reduced2.png";
+		private const string testQuadColorNonSequentialPngFileName = "quarter-red-green-orange-blue-20x10.png";
+		private const string testQuadColorNonSequentialReduced2PngFileName = "quarter-red-green-orange-blue-20x10-reduced2.png";
 
 		public static string TestPngFilePath => GetResourcePath(testPngFileName);
 		public static string TestSolidRedPngFilePath => GetResourcePath(testSolidRedPngFileName);
 		public static string TestHalfRedBluePngFilePath => GetResourcePath(testHalfRedBluePngFileName);
 		public static string TestQuadColorPngFilePath => GetResourcePath(testQuadColorPngFileName);
 		public static string TestQuadColorReduced2PngFilePath => GetResourcePath(testQuadColorReduced2PngFileName);
+		public static string TestQuadColorNonSequentialPngFilePath => GetResourcePath(testQuadColorNonSequentialPngFileName);
+		public static string TestQuadColorNonSequentialReduced2PngFilePath => GetResourcePath(testQuadColorNonSequentialReduced2PngFileName);
 
 		public static string GetResourcePath(string resourceName)
 		{
