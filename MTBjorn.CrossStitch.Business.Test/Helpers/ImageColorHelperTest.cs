@@ -104,12 +104,19 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		}
 
 		[Test]
-		public void TEST()
+		public void GetReducedColorSet_TEST()
 		{
-			using var image = ImageFileIO.LoadImage<Rgb24>(Global.TestHalfRedBluePngFilePath);
+			using var image = ImageFileIO.LoadImage<Rgb24>(Global.TestQuadColorPngFilePath);
 			var colors = ImageColorHelper.GetAllColors(image);
 
-			var result = ImageColorHelper.GetReducedColorSet(colors, 1);
+			var result = ImageColorHelper.GetReducedColorSet(colors, 2);
+			var expectedResult = new List<Rgb24>
+			{
+				new Rgb24(255, 64, 0),
+				new Rgb24(0, 128, 128)
+			};
+
+			CollectionAssert.AreEquivalent(expectedResult, result);
 		}
 	}
 }
