@@ -112,8 +112,8 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 			var result = ImageColorHelper.GetReducedColorSet(colors, 2);
 			var expectedResult = new List<Rgb24>
 			{
-				new Rgb24(255, 64, 0),
-				new Rgb24(0, 128, 128)
+				new Rgb24(170, 128, 0),
+				new Rgb24(0, 0, 255)
 			};
 
 			CollectionAssert.AreEquivalent(expectedResult, result);

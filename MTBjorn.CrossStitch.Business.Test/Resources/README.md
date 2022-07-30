@@ -23,7 +23,7 @@
 ** and the associated 2 color reduced image
 
 ````powershell
-& magick.exe convert -size 10x10 xc:"rgb(255,64,0)" xc:"rgb(0,128,128)" +append quarter-red-orange-blue-green-20x10-reduced2.png
+& magick.exe convert -size 10x10 xc:"rgb(170,128,0)" -size 5x10 xc:"rgb(0,0,255)" -size 5x10 xc:"rgb(170,128,0)" +append quarter-red-orange-blue-green-20x10-reduced2.png
 ````
 
 * A (slightly different) quarter red, green, orange, & blue (horizontal split) 10x20 png
@@ -35,5 +35,5 @@
 ** and the associated 2 color reduced image
 
 ````powershell
-& magick.exe -size 5x10 xc:"rgb(255,64,0)" xc:"rgb(0,128,128)" xc:"rgb(255,64,0)" xc:"rgb(0,128,128)" +append quarter-red-green-orange-blue-20x10-reduced2.png
+& magick.exe -size 5x10 xc:"rgb(170,128,0)" xc:"rgb(170,128,0)" xc:"rgb(170,128,0)" xc:"rgb(0,0,255)" +append quarter-red-green-orange-blue-20x10-reduced2.png
 ````

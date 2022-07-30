@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp.PixelFormats;
+﻿using MTBjorn.CrossStitch.Business.Extensions;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,13 +56,109 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 				return pixels;
 			if (reducedColorCount == 1)
 				return new List<Rgb24> {
-					GetCentroid(pixels)
+					pixels.GetCentroid()
 				};
 
-			var correlationMatrix = GetDistanceCorrelationMatrix(pixels);
-			var centroid = GetCentroid(pixels);
+			if (reducedColorCount == 2)
+				return TwoColorAlgorithm(pixels);
 
 			throw new NotImplementedException("TODO: implement");
+		}
+
+		private static List<Rgb24> TwoColorAlgorithm(List<Rgb24> pixels)
+		{
+			var (firstGroup, secondGroup) = GetTwoInitialGroups(pixels);
+
+			// 2. Reassess each group after computing their new centers
+			//   - NOTE: check distance of each point in a group from each group's centroid
+			Reassess(ref firstGroup, ref secondGroup);
+			Reassess(ref secondGroup, ref firstGroup);
+
+			return new List<Rgb24>()
+			{
+				firstGroup.GetCentroid(),
+				secondGroup.GetCentroid()
+			};
+		}
+
+		private static void Reassess(ref List<Rgb24> firstGroup, ref List<Rgb24> secondGroup)
+		{
+			var firstGroupCorrelation = GetDistanceCorrelationMatrix(Enumerable.Repeat(firstGroup.GetCentroid(), 1)
+				.Concat(firstGroup)
+				.Concat(Enumerable.Repeat(secondGroup.GetCentroid(), 1))
+				.ToList());
+			for (var i = 1; i < firstGroupCorrelation.GetLength(0) - 2; i++)
+			{
+				var distanceFromFirstGroupCenter = Math.Abs(firstGroupCorrelation[0, i]);
+				var distanceFromSecondGroupCenter = Math.Abs(firstGroupCorrelation[firstGroupCorrelation.GetLength(0) - 1, i]);
+				if (distanceFromFirstGroupCenter > distanceFromSecondGroupCenter)
+				{
+					secondGroup.Add(firstGroup[i - 1]);
+					firstGroup.RemoveAt(i - 1);
+					Reassess(ref firstGroup, ref secondGroup); // TODO: verify there's no trap with this iteration
+				}
+			}
+		}
+
+		private static (List<Rgb24>, List<Rgb24>) GetTwoInitialGroups(List<Rgb24> pixels)
+		{
+			var correlationMatrix = GetDistanceCorrelationMatrix(pixels);
+
+			// 1. Grab initial 2 colors as those being the furthest apart
+			//   - TODO: how to handle multiple pairs equally far apart?
+			//   - NOTE: only need to search either the upper or lower half of correlation matrix
+			var greatestDistance = -1.0d;
+			var referenceIndices = new int[2];
+			for (var i = 0; i < pixels.Count; i++)
+			{
+				for (var j = i; j < pixels.Count; j++)
+				{
+					var distance = Math.Abs(correlationMatrix[i, j]);
+					if (distance > greatestDistance)
+					{
+						greatestDistance = distance;
+						referenceIndices[0] = i;
+						referenceIndices[1] = j;
+					}
+				}
+			}
+			var firstReference = pixels[referenceIndices[0]];
+			var secondReference = pixels[referenceIndices[1]];
+			var firstGroup = new List<Rgb24>
+			{
+				firstReference
+			};
+			var secondGroup = new List<Rgb24>
+			{
+				secondReference
+			};
+			var questionableGroup = new List<Rgb24>();
+
+			// 2. Put remaining pixels in the group they each are closest to
+			foreach (var i in Enumerable.Range(0, pixels.Count).Except(referenceIndices))
+			{
+				var point = pixels[i];
+				//var distanceFromFirstReference = GetDistance(point, firstReference);
+				//var distanceFromSecondReference = GetDistance(point, secondReference);
+				var distanceFromFirstReference = Math.Abs(correlationMatrix[i, referenceIndices[0]]);
+				var distanceFromSecondReference = Math.Abs(correlationMatrix[i, referenceIndices[1]]);
+
+				if (distanceFromFirstReference < distanceFromSecondReference)
+					firstGroup.Add(point);
+				else if (distanceFromFirstReference > distanceFromSecondReference)
+					secondGroup.Add(point);
+				else
+					questionableGroup.Add(point); // NOTE: a decision must be made if a point is equidistant from each group
+			}
+			foreach (var point in questionableGroup)
+			{
+				if (firstGroup.Count > secondGroup.Count)
+					secondGroup.Add(point);
+				else
+					firstGroup.Add(point);
+			}
+
+			return (firstGroup, secondGroup);
 		}
 
 		private static IEnumerable<TPixel> GetAllPixels<TPixel>(IS.Image<TPixel> image) where TPixel : unmanaged, IPixel<TPixel>
@@ -98,23 +195,5 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 
 			return Math.Sqrt(redPortion + greenPortion + bluePortion);
 		}
-
-		private static Rgb24 GetCentroid(List<Rgb24> pixels)
-		{
-			var (redValues, greenValues, blueValues) = GetValuesFromEachDimension(pixels);
-			var redAverage = (byte)GetAverage(redValues.ToArray());
-			var greenAverage = (byte)GetAverage(greenValues.ToArray());
-			var blueAverage = (byte)GetAverage(blueValues.ToArray());
-
-			return new Rgb24(redAverage, greenAverage, blueAverage);
-		}
-
-		private static (IEnumerable<int> redValues, IEnumerable<int> greenValues, IEnumerable<int> blueValues) GetValuesFromEachDimension(IEnumerable<Rgb24> pixels) => (
-			pixels.Select(p => (int)p.R),
-			pixels.Select(p => (int)p.G),
-			pixels.Select(p => (int)p.B)
-		);
-
-		private static int GetAverage(params int[] values) => (int)Math.Round((double)values.Sum() / values.Length);
 	}
 }
