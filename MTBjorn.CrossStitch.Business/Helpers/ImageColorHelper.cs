@@ -23,11 +23,11 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			return colorMap.Values.ToList();
 		}
 
-		public static List<TPixel> GetReducedColorSet<TPixel>(List<TPixel> pixels, int reducedColorCount) where TPixel : unmanaged, IPixel<TPixel>
+		public static List<ColorGroup<TPixel>> GetReducedColorSet<TPixel>(List<TPixel> pixels, int reducedColorCount) where TPixel : unmanaged, IPixel<TPixel>
 		{
 			if (typeof(TPixel) == typeof(Rgb24))
 				return VectorDistanceColorReductionAlgorithm(pixels.Cast<Rgb24>().ToList(), reducedColorCount)
-					.Cast<TPixel>()
+					.Cast<ColorGroup<TPixel>>()
 					.ToList();
 
 			throw new NotImplementedException($"No algorithm implemented to reduce pixel type: {typeof(TPixel)}");
@@ -48,31 +48,27 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		///       - i.e. clusters near one another may be pulled, as if by gravity, towards one another if one is 'denser' than the other
 		/// 4. ...
 		/// </summary>
-		private static List<Rgb24> VectorDistanceColorReductionAlgorithm(List<Rgb24> pixels, int reducedColorCount)
+		private static List<RgbColorGroup> VectorDistanceColorReductionAlgorithm(List<Rgb24> pixels, int reducedColorCount)
 		{
 			if (reducedColorCount <= 0)
 				return null;
 			if (reducedColorCount >= pixels.Count)
-				return pixels;
+				return pixels.Select(p => new RgbColorGroup(new[] { p })).ToList();
 			if (reducedColorCount == 1)
-				return new List<Rgb24> {
-					pixels.GetCentroid()
+				return new List<RgbColorGroup>
+				{
+					new RgbColorGroup(pixels)
 				};
 
-			if (reducedColorCount == 2)
-				return TwoColorAlgorithm(pixels); // NColorAlgorithm(pixels, 2);
-			if (reducedColorCount == 3)
-				return NColorAlgorithm(pixels, 3);
-
-			throw new NotImplementedException("TODO: implement");
+			return NColorAlgorithm(pixels, reducedColorCount);
 		}
 
-		private static List<Rgb24> NColorAlgorithm(List<Rgb24> pixels, int numberOfPoints)
+		private static List<RgbColorGroup> NColorAlgorithm(List<Rgb24> pixels, int numberOfPoints)
 		{
 			var initialGroups = GetGroupsAroundNFurthestPoints(pixels, numberOfPoints);
 			var updatedGroups = Rebalance(initialGroups);
 
-			return updatedGroups.Select(g => g.GetCentroid()).ToList();
+			return updatedGroups.Select(g => new RgbColorGroup(g)).ToList();
 		}
 
 		private static List<List<Rgb24>> GetGroupsAroundNFurthestPoints(List<Rgb24> pixels, int numberOfPoints)
@@ -185,7 +181,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			var centroids = groupings.Select(g => g.GetCentroid());
 			var pixels = groupings.SelectMany(g => g).ToList();
 			var correlationMatrix = GetDistanceCorrelationMatrix(centroids.Concat(pixels).ToList());
-			var newGroups = new List<Rgb24>[groupings.Count];
+			var newGroups = GetInitializeGroupList(groupings.Count);
 			var aPixelShifted = false;
 
 			for (var pixelIndex = 0; pixelIndex < pixels.Count; pixelIndex++)
@@ -212,6 +208,15 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 				return Rebalance(newGroups.ToList());
 
 			return newGroups.ToList();
+		}
+
+		private static List<Rgb24>[] GetInitializeGroupList(int groupCount)
+		{
+			var groups = new List<Rgb24>[groupCount];
+			for (var i = 0; i < groupCount; i++)
+				groups[i] = new List<Rgb24>();
+
+			return groups;
 		}
 
 		private static (List<Rgb24>, List<Rgb24>) GetTwoInitialGroups(List<Rgb24> pixels)
