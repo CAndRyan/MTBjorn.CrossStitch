@@ -10,8 +10,8 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		[Test]
 		public void GetPixelDimensions_WithMaxWidthAndHeight()
 		{
-			var maxWidth = 8.5m;
-			var maxHeight = 11.0m;
+			var maxWidth = 8.5d;
+			var maxHeight = 11.0d;
 			var pointsPerInch = 14;
 
 			var (width, height) = AidaClothHelper.GetPixelDimensions(maxWidth, maxHeight, pointsPerInch);
@@ -26,7 +26,7 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		[TestCase(1.0, -1.0, 1)]
 		[TestCase(1.0, 1.0, 0)]
 		[TestCase(1.0, 1.0, -1)]
-		public void GetPixelDimensions_WithInvalidValues_Throws(decimal maxWidth, decimal maxHeight, int pointsPerInch)
+		public void GetPixelDimensions_WithInvalidValues_Throws(double maxWidth, double maxHeight, int pointsPerInch)
 		{
 			Assert.Throws<ArgumentException>(() => AidaClothHelper.GetPixelDimensions(maxWidth, maxHeight, pointsPerInch));
 		}
@@ -34,16 +34,16 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		[Test]
 		public void GetPixelDimensions_WithNoMax_Throws()
 		{
-			Assert.Throws<ArgumentException>(() => AidaClothHelper.GetPixelDimensions(0m, 0m, 14));
+			Assert.Throws<ArgumentException>(() => AidaClothHelper.GetPixelDimensions(0d, 0d, 14));
 		}
 
 		[Test]
 		public void GetPixelDimensions_WithMaxWidthOnly()
 		{
-			var maxWidth = 8.5m;
+			var maxWidth = 8.5d;
 			var pointsPerInch = 14;
 
-			var (width, height) = AidaClothHelper.GetPixelDimensions(maxWidth, 0m, pointsPerInch);
+			var (width, height) = AidaClothHelper.GetPixelDimensions(maxWidth, 0d, pointsPerInch);
 
 			var expectedWidth = (int)(maxWidth * pointsPerInch);
 			Assert.AreEqual(expectedWidth, width);
@@ -53,10 +53,10 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		[Test]
 		public void GetPixelDimensions_WithMaxHeightOnly()
 		{
-			var maxHeight = 11.0m;
+			var maxHeight = 11.0d;
 			var pointsPerInch = 14;
 
-			var (width, height) = AidaClothHelper.GetPixelDimensions(0m, maxHeight, pointsPerInch);
+			var (width, height) = AidaClothHelper.GetPixelDimensions(0d, maxHeight, pointsPerInch);
 
 			var expectedHeight = (int)(maxHeight * pointsPerInch);
 			Assert.AreEqual(expectedHeight, height);
@@ -68,8 +68,8 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		{
 			var originalWidth = 100;
 			var originalHeight = 80;
-			var maxWidth = 8.0m;
-			var maxHeight = 0m; // TODO: find way to detect which dimension should be zero...
+			var maxWidth = 8.0d;
+			var maxHeight = 0d; // TODO: find way to detect which dimension should be zero...
 			var pointsPerInch = 14;
 
 			var (width, height) = AidaClothHelper.GetPixelDimensions(originalWidth, originalHeight, maxWidth, maxHeight, pointsPerInch);
@@ -85,8 +85,8 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 		{
 			var originalWidth = 80;
 			var originalHeight = 100;
-			var maxWidth = 0m; // TODO: find way to detect which dimension should be zero...
-			var maxHeight = 8.0m;
+			var maxWidth = 0d; // TODO: find way to detect which dimension should be zero...
+			var maxHeight = 8.0d;
 			var pointsPerInch = 14;
 
 			var (width, height) = AidaClothHelper.GetPixelDimensions(originalWidth, originalHeight, maxWidth, maxHeight, pointsPerInch);

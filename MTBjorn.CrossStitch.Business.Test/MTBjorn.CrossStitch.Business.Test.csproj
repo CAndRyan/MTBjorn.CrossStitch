@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\egypticon-128x128-rgba.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\egypticon-128x128.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -16,8 +16,8 @@ namespace MTBjorn.CrossStitch.Business.Image
 	/// </summary>
 	public class ImageParser
 	{
-		private readonly decimal maxWidth;
-		private readonly decimal maxHeight;
+		private readonly double maxWidth;
+		private readonly double maxHeight;
 		private readonly int pointsPerInch;
 
 		/// <summary>
@@ -26,23 +26,21 @@ namespace MTBjorn.CrossStitch.Business.Image
 		/// <param name="maxHeight">Max canvas height in inches</param>
 		/// <param name="maxWidth">Max canvas width in inches</param>
 		/// <param name="pointsPerInch">Points/pixels per inch of fabric</param>
-		public ImageParser(decimal maxHeight, decimal maxWidth, int pointsPerInch)
+		public ImageParser(double maxWidth, double maxHeight, int pointsPerInch)
 		{
-			this.maxHeight = maxHeight;
 			this.maxWidth = maxWidth;
+			this.maxHeight = maxHeight;
 			this.pointsPerInch = pointsPerInch;
 		}
 
-		public void DO(string inputFilePath)
+		public void DO(string inputFilePath, string outputFilePath, int numberOfColors)
 		{
 			var resizedImage = ResizeToClothDimensions<Rgb24>(inputFilePath);
-
-			// TODO: implement
 			var allColors = ImageColorHelper.GetAllColors(resizedImage);
-			var reducedColorSet = ImageColorHelper.GetReducedColorSet(allColors, 100);
-			AdjustColors(resizedImage, reducedColorSet);
+			var reducedColorSet = ImageColorHelper.GetReducedColorSet(allColors, numberOfColors);
 
-			ImageFileIO.Save(resizedImage, "D:\\chris\\downloads\\crossStitchExample.png");
+			//AdjustColors(resizedImage, reducedColorSet);
+			//ImageFileIO.Save(resizedImage, outputFilePath);
 		}
 
 		private void AdjustColors<TPixel>(IS.Image<TPixel> image, List<ColorGroup<TPixel>> colorSet) where TPixel : unmanaged, IPixel<TPixel>

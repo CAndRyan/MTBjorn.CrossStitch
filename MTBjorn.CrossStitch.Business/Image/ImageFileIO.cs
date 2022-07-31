@@ -21,7 +21,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 
 		public static IS.Image LoadImage(string filePath)
 		{
-			var fileStream = Load(filePath);
+			using var fileStream = Load(filePath);
 			return IS.Image.Load(fileStream);
 		}
 
@@ -30,7 +30,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 		/// </summary>
 		public static IS.Image<TPixel> LoadImage<TPixel>(string filePath) where TPixel : unmanaged, IPixel<TPixel>
 		{
-			var fileStream = Load(filePath);
+			using var fileStream = Load(filePath);
 			return IS.Image.Load<TPixel>(fileStream);
 		}
 

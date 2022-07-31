@@ -5,7 +5,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 {
 	public static class AidaClothHelper
 	{
-		public static (int width, int height) GetPixelDimensions(decimal maxWidth, decimal maxHeight, int pointsPerInch)
+		public static (int width, int height) GetPixelDimensions(double maxWidth, double maxHeight, int pointsPerInch)
 		{
 			if (maxWidth < 0 || maxHeight < 0 || pointsPerInch <= 0)
 				throw new ArgumentException($"Invalid argument(s): {nameof(maxWidth)}={maxWidth}, {nameof(maxHeight)}={maxHeight}, {nameof(pointsPerInch)}={pointsPerInch}");
@@ -18,7 +18,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 			return (roundedWidth, roundedHeight);
 		}
 
-		public static (int width, int height) GetPixelDimensions(int originalWidth, int originalHeight, decimal maxWidth, decimal maxHeight, int pointsPerInch)
+		public static (int width, int height) GetPixelDimensions(int originalWidth, int originalHeight, double maxWidth, double maxHeight, int pointsPerInch)
 		{
 			if (maxWidth < 0 || maxHeight < 0 || pointsPerInch <= 0)
 				throw new ArgumentException($"Invalid argument(s): {nameof(maxWidth)}={maxWidth}, {nameof(maxHeight)}={maxHeight}, {nameof(pointsPerInch)}={pointsPerInch}");
@@ -29,7 +29,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 			return (0, (int)(maxHeight * pointsPerInch));
 		}
 
-		public static (int width, int height) GetPixelDimensions(IS.Image image, decimal maxWidth, decimal maxHeight, int pointsPerInch)
+		public static (int width, int height) GetPixelDimensions(IS.Image image, double maxWidth, double maxHeight, int pointsPerInch)
 		{
 			return GetPixelDimensions(image.Width, image.Height, maxWidth, maxHeight, pointsPerInch);
 		}
