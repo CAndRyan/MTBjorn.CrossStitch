@@ -70,10 +70,9 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		private static List<Rgb24> NColorAlgorithm(List<Rgb24> pixels, int numberOfPoints)
 		{
 			var initialGroups = GetGroupsAroundNFurthestPoints(pixels, numberOfPoints);
+			var updatedGroups = Rebalance(initialGroups);
 
-			// TODO: how should groupings be reassessed?
-
-			return initialGroups.Select(g => g.GetCentroid()).ToList();
+			return updatedGroups.Select(g => g.GetCentroid()).ToList();
 		}
 
 		private static List<List<Rgb24>> GetGroupsAroundNFurthestPoints(List<Rgb24> pixels, int numberOfPoints)
@@ -171,6 +170,48 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 					Reassess(ref firstGroup, ref secondGroup); // TODO: verify there's no trap with this iteration
 				}
 			}
+		}
+
+		/// <summary>
+		/// Rebalance each grouping such that every point within a group is closer to that group's centroid than the centroid of any other group
+		/// 1. Build a distance correlation matrix with each actual pixel and each group's centroid
+		/// 2. Move pixels into whichever group they're closest to the centroid of
+		/// 3. Repeat steps 1 & 2 (until no pixels change group)
+		///
+		/// TODO: test that this behavior is truly necessary
+		/// </summary>
+		private static List<List<Rgb24>> Rebalance(List<List<Rgb24>> groupings)
+		{
+			var centroids = groupings.Select(g => g.GetCentroid());
+			var pixels = groupings.SelectMany(g => g).ToList();
+			var correlationMatrix = GetDistanceCorrelationMatrix(centroids.Concat(pixels).ToList());
+			var newGroups = new List<Rgb24>[groupings.Count];
+			var aPixelShifted = false;
+
+			for (var pixelIndex = 0; pixelIndex < pixels.Count; pixelIndex++)
+			{
+				var currentLeastDistance = double.MaxValue;
+				var leastDistanceGroupIndex = -1;
+				for (var groupIndex = 0; groupIndex < groupings.Count; groupIndex++)
+				{
+					var rowIndex = pixelIndex + groupings.Count;
+					var distance = Math.Abs(correlationMatrix[groupIndex, rowIndex]);
+					if (distance < currentLeastDistance)
+					{
+						currentLeastDistance = distance;
+						leastDistanceGroupIndex = groupIndex;
+					}
+				}
+				newGroups[leastDistanceGroupIndex].Add(pixels[pixelIndex]);
+
+				if (!groupings[leastDistanceGroupIndex].Contains(pixels[pixelIndex]))
+					aPixelShifted = true;
+			}
+
+			if (aPixelShifted)
+				return Rebalance(newGroups.ToList());
+
+			return newGroups.ToList();
 		}
 
 		private static (List<Rgb24>, List<Rgb24>) GetTwoInitialGroups(List<Rgb24> pixels)
