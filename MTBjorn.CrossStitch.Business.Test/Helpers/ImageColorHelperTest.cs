@@ -118,5 +118,24 @@ namespace MTBjorn.CrossStitch.Business.Test.Helpers
 
 			CollectionAssert.AreEquivalent(expectedResult, result);
 		}
+
+		[Test]
+		public void GetReducedColorSet_4Colors_3Reduced_ReturnsCentroidOfSubGroups()
+		{
+			using var image = ImageFileIO.LoadImage<Rgb24>(Global.TestQuadColorPngFilePath);
+			var colors = ImageColorHelper.GetAllColors(image);
+
+			var result = ImageColorHelper.GetReducedColorSet(colors, 3);
+			var expectedResult = new List<Rgb24>
+			{
+				new Rgb24(255, 64, 0),
+				new Rgb24(0, 0, 255),
+				new Rgb24(0, 255, 0)
+			};
+
+			CollectionAssert.AreEquivalent(expectedResult, result);
+		}
+
+		// TODO: implement algorithm that also weights each group relative to one another?
 	}
 }

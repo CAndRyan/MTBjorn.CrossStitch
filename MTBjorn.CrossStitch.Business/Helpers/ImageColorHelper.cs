@@ -60,9 +60,82 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 				};
 
 			if (reducedColorCount == 2)
-				return TwoColorAlgorithm(pixels);
+				return TwoColorAlgorithm(pixels); // NColorAlgorithm(pixels, 2);
+			if (reducedColorCount == 3)
+				return NColorAlgorithm(pixels, 3);
 
 			throw new NotImplementedException("TODO: implement");
+		}
+
+		private static List<Rgb24> NColorAlgorithm(List<Rgb24> pixels, int numberOfPoints)
+		{
+			var initialGroups = GetGroupsAroundNFurthestPoints(pixels, numberOfPoints);
+
+			// TODO: how should groupings be reassessed?
+
+			return initialGroups.Select(g => g.GetCentroid()).ToList();
+		}
+
+		private static List<List<Rgb24>> GetGroupsAroundNFurthestPoints(List<Rgb24> pixels, int numberOfPoints)
+		{
+			var correlationMatrix = GetDistanceCorrelationMatrix(pixels);
+
+			var greatestDistance = -1.0d;
+			var initialReferenceIndices = new int[2];
+			for (var col = 0; col < pixels.Count; col++)
+			{
+				for (var row = col; row < pixels.Count; row++)
+				{
+					var distance = Math.Abs(correlationMatrix[col, row]);
+					if (distance > greatestDistance)
+					{
+						greatestDistance = distance;
+						initialReferenceIndices[0] = col;
+						initialReferenceIndices[1] = row;
+					}
+				}
+			}
+			var referenceIndices = new List<int>(initialReferenceIndices);
+
+			while (referenceIndices.Count < numberOfPoints)
+			{
+				var greatestConsolidatedDistance = -1.0d;
+				var currentReferenceIndex = -1;
+				foreach (var index in Enumerable.Range(0, pixels.Count).Except(referenceIndices))
+				{
+					var distanceFromFirstReference = Math.Abs(correlationMatrix[index, referenceIndices[0]]);
+					var distanceFromSecondReference = Math.Abs(correlationMatrix[index, referenceIndices[1]]);
+					var consolidatedDistance = distanceFromFirstReference + distanceFromSecondReference;
+
+					if (consolidatedDistance >= greatestConsolidatedDistance)
+					{
+						greatestConsolidatedDistance = consolidatedDistance;
+						currentReferenceIndex = index;
+					}
+				}
+				referenceIndices.Add(currentReferenceIndex);
+			}
+
+			var groupMap = referenceIndices.ToDictionary(r => r, r => new List<Rgb24>
+			{
+				pixels[r]
+			});
+
+			// fill groups with closest pixels
+			foreach (var i in Enumerable.Range(0, pixels.Count).Except(referenceIndices))
+			{
+				var point = pixels[i];
+				var closestReferencePointIndex = referenceIndices
+					.Select(r => (Index: r, Distance: Math.Abs(correlationMatrix[i, r])))
+					.OrderBy(t => t.Distance)
+					.First().Index;
+
+				groupMap[closestReferencePointIndex].Add(point);
+
+				// NOTE: a decision must be made if a point is equidistant from multiple groups
+			}
+
+			return groupMap.Values.ToList();
 		}
 
 		private static List<Rgb24> TwoColorAlgorithm(List<Rgb24> pixels)
