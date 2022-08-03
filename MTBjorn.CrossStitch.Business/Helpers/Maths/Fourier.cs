@@ -3,37 +3,37 @@
 namespace MTBjorn.CrossStitch.Business.Helpers.Maths
 {
 	// Adapted from: https://www.egr.msu.edu/classes/ece480/capstone/fall11/group06/style/Application_Note_ChrisOakley.pdf
-	class fourier
+	public static class Fourier
 	{
-		public static complex[] DFT(complex[] x)
+		public static Complex[] DFT(Complex[] x)
 		{
 			int N = x.Length;
-			complex[] X = new complex[N];
+			Complex[] X = new Complex[N];
 			for (int k = 0; k < N; k++)
 			{
-				X[k] = new complex(0, 0);
+				X[k] = new Complex(0, 0);
 				for (int n = 0; n < N; n++)
 				{
-					complex temp = complex.from_polar(1, -2 * Math.PI * n * k / N);
+					Complex temp = Complex.from_polar(1, -2 * Math.PI * n * k / N);
 					temp *= x[n];
 					X[k] += temp;
 				}
 			}
 			return X;
 		}
-		public static complex[] FFT(complex[] x)
+		public static Complex[] FFT(Complex[] x)
 		{
 			int N = x.Length;
-			complex[] X = new complex[N];
-			complex[] d, D, e, E;
+			Complex[] X = new Complex[N];
+			Complex[] d, D, e, E;
 			if (N == 1)
 			{
 				X[0] = x[0];
 				return X;
 			}
 			int k;
-			e = new complex[N / 2];
-			d = new complex[N / 2];
+			e = new Complex[N / 2];
+			d = new Complex[N / 2];
 			for (k = 0; k < N / 2; k++)
 			{
 				e[k] = x[2 * k];
@@ -43,7 +43,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers.Maths
 			E = FFT(e);
 			for (k = 0; k < N / 2; k++)
 			{
-				complex temp = complex.from_polar(1, -2 * Math.PI * k / N);
+				Complex temp = Complex.from_polar(1, -2 * Math.PI * k / N);
 				D[k] *= temp;
 			}
 			for (k = 0; k < N / 2; k++)

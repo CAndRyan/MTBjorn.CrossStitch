@@ -2,18 +2,18 @@
 
 namespace MTBjorn.CrossStitch.Business.Helpers.Maths
 {
-	class complex
+	public class Complex
 	{
-		public float real = 0.0;
-		public float imag = 0.0;
+		public double real;
+		public double imag;
 		//Empty constructor
-		public complex()
+		public Complex()
 		{
 		}
-		public complex(float real, float im)
+		public Complex(double real, double im)
 		{
 			this.real = real;
-			this.imag = imag;
+			this.imag = im;
 		}
 		public string ToString()
 		{
@@ -21,37 +21,36 @@ namespace MTBjorn.CrossStitch.Business.Helpers.Maths
 			return data;
 		}
 		//Convert from polar to rectangular
-		public static complex from_polar(double r, double radians)
+		public static Complex from_polar(double r, double radians)
 		{
-			complex data = new complex(r * Math.Cos(radians), r * Math.Sin(radians));
+			Complex data = new Complex(r * Math.Cos(radians), r * Math.Sin(radians));
 			return data;
 		}
 		//Override addition operator
-		public static complex operator +(complex a, complex b)
+		public static Complex operator +(Complex a, Complex b)
 		{
-			complex data = new complex(a.real + b.real, a.imag + b.imag);
+			Complex data = new Complex(a.real + b.real, a.imag + b.imag);
 			return data;
 		}
 		//Override subtraction operator
-		public static complex operator -(complex a, complex b)
+		public static Complex operator -(Complex a, Complex b)
 		{
-			complex data = new complex(a.real - b.real, a.imag - b.imag);
+			Complex data = new Complex(a.real - b.real, a.imag - b.imag);
 			return data;
 		}
 		//Override multiplication operator
-		public static complex operator *(complex a, complex b)
+		public static Complex operator *(Complex a, Complex b)
 		{
-			complex data = new complex((a.real * b.real) - (a.imag * b.imag),
-			(a.real * b.imag + (a.imag * b.real));
+			Complex data = new Complex((a.real * b.real) - (a.imag * b.imag), a.real * b.imag + (a.imag * b.real));
 			return data;
 		}
 		//Return magnitude of complex number
-		public float magnitude {
+		public double magnitude {
 			get {
 				return Math.Sqrt(Math.Pow(real, 2) + Math.Pow(imag, 2));
 			}
 		}
-		public float phase {
+		public double phase {
 			get {
 				return Math.Atan(imag / real);
 			}
