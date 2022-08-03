@@ -4,56 +4,36 @@ namespace MTBjorn.CrossStitch.Business.Helpers.Maths
 {
 	public class Complex
 	{
-		public double real;
-		public double imag;
-		//Empty constructor
-		public Complex()
-		{
-		}
-		public Complex(double real, double im)
+		private readonly double real;
+		private readonly double imaginary;
+
+		public Complex(double real, double imaginary)
 		{
 			this.real = real;
-			this.imag = im;
+			this.imaginary = imaginary;
 		}
-		public string ToString()
+
+		/// <summary>
+		/// Convert from polar coordinates to cartesian
+		/// </summary>
+		public static Complex GetFromPolarCoordinates(double r, double radians) => new Complex(r * Math.Cos(radians), r * Math.Sin(radians));
+
+		public double GetMagnitude() => Math.Sqrt(Math.Pow(real, 2) + Math.Pow(imaginary, 2));
+
+		public double GetPhase() => Math.Atan(imaginary / real);
+
+		public override string ToString() => $"{real} + {imaginary}i";
+
+		public static Complex operator +(Complex first, Complex second) => new Complex(first.real + second.real, first.imaginary + second.imaginary);
+
+		public static Complex operator -(Complex first, Complex second) => new Complex(first.real - second.real, first.imaginary - second.imaginary);
+
+		public static Complex operator *(Complex first, Complex second)
 		{
-			string data = real.ToString() + " " + imag.ToString() + "i";
-			return data;
-		}
-		//Convert from polar to rectangular
-		public static Complex from_polar(double r, double radians)
-		{
-			Complex data = new Complex(r * Math.Cos(radians), r * Math.Sin(radians));
-			return data;
-		}
-		//Override addition operator
-		public static Complex operator +(Complex a, Complex b)
-		{
-			Complex data = new Complex(a.real + b.real, a.imag + b.imag);
-			return data;
-		}
-		//Override subtraction operator
-		public static Complex operator -(Complex a, Complex b)
-		{
-			Complex data = new Complex(a.real - b.real, a.imag - b.imag);
-			return data;
-		}
-		//Override multiplication operator
-		public static Complex operator *(Complex a, Complex b)
-		{
-			Complex data = new Complex((a.real * b.real) - (a.imag * b.imag), a.real * b.imag + (a.imag * b.real));
-			return data;
-		}
-		//Return magnitude of complex number
-		public double magnitude {
-			get {
-				return Math.Sqrt(Math.Pow(real, 2) + Math.Pow(imag, 2));
-			}
-		}
-		public double phase {
-			get {
-				return Math.Atan(imag / real);
-			}
+			var localPart = (first.real * second.real) - (first.imaginary * second.imaginary);
+			var imaginaryParty = (first.real * second.imaginary) + (first.imaginary * second.real);
+
+			return new Complex(localPart, imaginaryParty);
 		}
 	}
 }
