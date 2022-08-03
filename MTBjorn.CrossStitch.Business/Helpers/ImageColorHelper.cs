@@ -1,7 +1,9 @@
 ﻿using MTBjorn.CrossStitch.Business.Extensions;
+using Newtonsoft.Json;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using IS = SixLabors.ImageSharp;
 
@@ -66,7 +68,8 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		private static List<RgbColorGroup> NColorAlgorithm(List<Rgb24> pixels, int numberOfPoints)
 		{
 			var initialGroups = GetGroupsAroundNFurthestPoints(pixels, numberOfPoints);
-			var updatedGroups = Rebalance(initialGroups);
+			//var updatedGroups = RebalanceIterative(initialGroups);
+			var updatedGroups = RebalanceIterativeWithDiagnostics(initialGroups);
 
 			return updatedGroups.Select(g => new RgbColorGroup(g)).ToList();
 		}
@@ -176,13 +179,93 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		///
 		/// TODO: test that this behavior is truly necessary
 		/// </summary>
-		private static List<List<Rgb24>> Rebalance(List<List<Rgb24>> groupings)
+		private static List<List<Rgb24>> RebalanceIterative(List<List<Rgb24>> groupings)
+		{
+			var balancedGroups = groupings;
+			var aPixelShifted = true;
+
+			while (aPixelShifted)
+				balancedGroups = Rebalance(balancedGroups, out aPixelShifted);
+
+			return balancedGroups;
+		}
+
+		private static List<List<Rgb24>> RebalanceIterativeWithDiagnostics(List<List<Rgb24>> groupings, string diagnosticsFilePath = @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json")
+		{
+			const int maxIterations = 5;
+
+			var balancedGroups = groupings;
+			var aPixelShifted = true;
+			var numberOfIterations = 0;
+			var pixelColorGroupHistory = balancedGroups.Select((g, i) => (group: g, groupIndex: i))
+				.SelectMany(gi => gi.group.Select(p => (pixel: p, groupIndex: gi.groupIndex)))
+				.ToDictionary(pi => pi.pixel.GetHashCode(), pi => (pixel: pi.pixel, groupIndices: new List<int> { pi.groupIndex }));
+			var groupCentroidHistory = balancedGroups.Select(g => new List<Rgb24> { g.GetCentroid() }).ToList();
+			var stopWatch = new Stopwatch();
+
+			stopWatch.Start();
+			while (aPixelShifted && numberOfIterations < maxIterations)
+			{
+				balancedGroups = Rebalance(balancedGroups, out aPixelShifted);
+				numberOfIterations++;
+
+				var pixelGroupData = balancedGroups.Select((g, i) => (group: g, groupIndex: i))
+					.SelectMany(gi => gi.group.Select(p => (pixel: p, groupIndex: gi.groupIndex)));
+				foreach (var (pixel, groupIndex) in pixelGroupData)
+				{
+					var pixelHash = pixel.GetHashCode();
+					if (pixelColorGroupHistory[pixelHash].groupIndices.Last() != groupIndex)
+						pixelColorGroupHistory[pixelHash].groupIndices.Add(groupIndex);
+				}
+
+				for (var i = 0; i < balancedGroups.Count; i++)
+					groupCentroidHistory[i].Add(balancedGroups[i].GetCentroid());
+			}
+			stopWatch.Stop();
+
+			//var pixelsThatMovedAtLeastOnce = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 1).Select(h => h.pixel).ToList();
+			//var pixelsThatMovedAtLeastTwice = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 2).Select(h => h.pixel).ToList();
+			//var pixelsThatMovedAtLeastThrice = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 3).Select(h => h.pixel).ToList();
+			//var pixelsThatMovedAtLeastFource = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 4).Select(h => h.pixel).ToList();
+			//var pixelsThatMovedAtLeastFifths = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 5).Select(h => h.pixel).ToList();
+			//var pixelsThatMovedAtLeastSixise = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 6).Select(h => h.pixel).ToList();
+			//var pixelsThatMovedAtLeastSeptise = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 7).Select(h => h.pixel).ToList();
+
+			var rebalanceHistory = new
+			{
+				Pixels = pixelColorGroupHistory.Values.Select(h => new
+				{
+					Pixel = new
+					{
+						R = h.pixel.R,
+						G = h.pixel.G,
+						B = h.pixel.B
+					},
+					Groups = h.groupIndices
+				}),
+				Centroids = groupCentroidHistory.Select(g => g.Select(c => new
+				{
+					R = c.R,
+					G = c.G,
+					B = c.B
+				}).ToList()),
+				NumberOfIterations = numberOfIterations,
+				Completed = !aPixelShifted,
+				ElapsedTime = $"{stopWatch.Elapsed.Hours}:{stopWatch.Elapsed.Minutes}:{stopWatch.Elapsed.Seconds}.{stopWatch.Elapsed.Milliseconds}"
+			};
+			var diagnosticsJson = JsonConvert.SerializeObject(rebalanceHistory);
+			System.IO.File.WriteAllText(diagnosticsFilePath, diagnosticsJson);
+
+			return balancedGroups;
+		}
+
+		private static List<List<Rgb24>> Rebalance(List<List<Rgb24>> groupings, out bool aPixelShifted) // TODO: determine how to clean up the data from each iteration. The large test case starts at 2.4GB & increases as much with each iterations, suggesting the data is duplicated in memory without any cleanup...
 		{
 			var centroids = groupings.Select(g => g.GetCentroid());
 			var pixels = groupings.SelectMany(g => g).ToList();
 			var correlationMatrix = GetDistanceCorrelationMatrix(centroids.Concat(pixels).ToList());
 			var newGroups = GetInitializeGroupList(groupings.Count);
-			var aPixelShifted = false;
+			aPixelShifted = false;
 
 			for (var pixelIndex = 0; pixelIndex < pixels.Count; pixelIndex++)
 			{
@@ -203,9 +286,6 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 				if (!groupings[leastDistanceGroupIndex].Contains(pixels[pixelIndex]))
 					aPixelShifted = true;
 			}
-
-			if (aPixelShifted)
-				return Rebalance(newGroups.ToList());
 
 			return newGroups.ToList();
 		}
@@ -287,6 +367,9 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 					yield return image[columnIndex, rowIndex];
 		}
 
+		/// <summary>
+		/// Technically this isn't a correlation matrix (https://cmci.colorado.edu/classes/INFO-1301/files/borgatti.htm) but just euclidian distance
+		/// </summary>
 		private static double[,] GetDistanceCorrelationMatrix(List<Rgb24> pixels)
 		{
 			var matrix = new double[pixels.Count, pixels.Count];

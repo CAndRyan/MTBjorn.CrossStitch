@@ -39,8 +39,8 @@ namespace MTBjorn.CrossStitch.Business.Image
 			var allColors = ImageColorHelper.GetAllColors(resizedImage);
 			var reducedColorSet = ImageColorHelper.GetReducedColorSet(allColors, numberOfColors);
 
-			//AdjustColors(resizedImage, reducedColorSet);
-			//ImageFileIO.Save(resizedImage, outputFilePath);
+			AdjustColors(resizedImage, reducedColorSet);
+			ImageFileIO.Save(resizedImage, outputFilePath);
 		}
 
 		private void AdjustColors<TPixel>(IS.Image<TPixel> image, List<ColorGroup<TPixel>> colorSet) where TPixel : unmanaged, IPixel<TPixel>
