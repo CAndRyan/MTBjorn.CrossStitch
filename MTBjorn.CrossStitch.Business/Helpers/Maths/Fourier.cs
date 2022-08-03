@@ -2,7 +2,10 @@
 
 namespace MTBjorn.CrossStitch.Business.Helpers.Maths
 {
-	// Adapted from: https://www.egr.msu.edu/classes/ece480/capstone/fall11/group06/style/Application_Note_ChrisOakley.pdf
+	/// <summary>
+	/// Class to compute Fourier transforms using the Cooley-Tukey algorithm
+	/// Adapted from: https://www.egr.msu.edu/classes/ece480/capstone/fall11/group06/style/Application_Note_ChrisOakley.pdf
+	/// </summary>
 	public static class Fourier
 	{
 		public static Complex[] DiscreteFourierTransform(Complex[] x)
