@@ -192,7 +192,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 
 		private static List<List<Rgb24>> RebalanceIterativeWithDiagnostics(List<List<Rgb24>> groupings, string diagnosticsFilePath = @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json")
 		{
-			const int maxIterations = 5;
+			const int maxIterations = 100;
 
 			var balancedGroups = groupings;
 			var aPixelShifted = true;
