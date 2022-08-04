@@ -21,7 +21,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 		private readonly int pointsPerInch;
 
 		/// <summary>
-		// A helper to load an image & resize according to desired Aida cloth dimensions
+		/// A helper to load an image & resize according to desired Aida cloth dimensions
 		/// </summary>
 		/// <param name="maxHeight">Max canvas height in inches</param>
 		/// <param name="maxWidth">Max canvas width in inches</param>
