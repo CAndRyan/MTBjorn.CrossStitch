@@ -1,38 +1,27 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using MTBjorn.CrossStitch.Business.Helpers;
-using Newtonsoft.Json;
-using Plotly.NET.CSharp;
+var builder = WebApplication.CreateBuilder(args);
 
-namespace MTBjorn.CrossStitch.Visualize
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-			var diagnosticsFilePath = @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json";
-			var diagnostics = File.ReadAllText(diagnosticsFilePath);
-            var rebalanceHistory = JsonConvert.DeserializeObject<RebalanceHistory>(diagnostics);
-
-			var chart = Chart.Point3D<int, int, int, string>(
-				x: rebalanceHistory.Centroids[1].Select(c => (int)c.R),
-				y: rebalanceHistory.Centroids[1].Select(c => (int)c.G),
-				z: rebalanceHistory.Centroids[1].Select(c => (int)c.B)
-			).WithTraceInfo("Centroids (0th)", ShowLegend: true)
-			.WithXAxisStyle<int, int, string>(Title: Plotly.NET.Title.init("Red"))
-			.WithYAxisStyle<int, int, string>(Title: Plotly.NET.Title.init("Green"));
-            //.WithZAxisStyle(Title: Plotly.NET.Title.init("Blue"))
-            chart.Show();
-
-   //         Chart.Point<double, double, string>(
-			//	x: new double[] { 1, 2 },
-			//	y: new double[] { 5, 10 }
-			//)
-			//.WithTraceInfo("Hello from C#", ShowLegend: true)
-			//.WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("xAxis"))
-			//.WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("yAxis"))
-			//.Show();
-		}
-	}
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
