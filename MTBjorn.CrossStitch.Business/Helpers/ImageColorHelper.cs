@@ -231,24 +231,24 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			//var pixelsThatMovedAtLeastSixise = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 6).Select(h => h.pixel).ToList();
 			//var pixelsThatMovedAtLeastSeptise = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 7).Select(h => h.pixel).ToList();
 
-			var rebalanceHistory = new
-			{
-				Pixels = pixelColorGroupHistory.Values.Select(h => new
-				{
-					Pixel = new
+			var rebalanceHistory = new RebalanceHistory
+            {
+				Pixels = pixelColorGroupHistory.Values.Select(h => new PixelHistory
+                {
+					Pixel = new Rgb24
 					{
 						R = h.pixel.R,
 						G = h.pixel.G,
 						B = h.pixel.B
 					},
 					Groups = h.groupIndices
-				}),
-				Centroids = groupCentroidHistory.Select(g => g.Select(c => new
+				}).ToArray(),
+				Centroids = groupCentroidHistory.Select(g => g.Select(c => new Rgb24
 				{
 					R = c.R,
 					G = c.G,
 					B = c.B
-				}).ToList()),
+				}).ToArray()).ToArray(),
 				NumberOfIterations = numberOfIterations,
 				Completed = !aPixelShifted,
 				ElapsedTime = $"{stopWatch.Elapsed.Hours}:{stopWatch.Elapsed.Minutes}:{stopWatch.Elapsed.Seconds}.{stopWatch.Elapsed.Milliseconds}"
@@ -259,7 +259,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			return balancedGroups;
 		}
 
-		private static List<List<Rgb24>> Rebalance(List<List<Rgb24>> groupings, out bool aPixelShifted) // TODO: determine how to clean up the data from each iteration. The large test case starts at 2.4GB & increases as much with each iterations, suggesting the data is duplicated in memory without any cleanup...
+        private static List<List<Rgb24>> Rebalance(List<List<Rgb24>> groupings, out bool aPixelShifted) // TODO: determine how to clean up the data from each iteration. The large test case starts at 2.4GB & increases as much with each iterations, suggesting the data is duplicated in memory without any cleanup...
 		{
 			var centroids = groupings.Select(g => g.GetCentroid());
 			var pixels = groupings.SelectMany(g => g).ToList();
