@@ -1,4 +1,6 @@
-﻿@{
+﻿@model string
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -13,5 +15,31 @@
 </div>
 
 <script defer>
-    alert('done');
+    document.addEventListener("DOMContentLoaded", function () {
+        const diagnostics = JSON.parse('@Html.Raw(Model)');
+        const data = diagnostics.Centroids.map((group, index) => ({
+            x: group.map(p => p.R),
+            y: group.map(p => p.G),
+            z: group.map(p => p.B),
+            name: `Group ${index}`,
+            mode: 'markers',
+            marker: {
+                size: 4
+            },
+            type: 'scatter3d'
+        }));
+        const layout = {
+            title: 'Centroids',
+            showlegend: true,
+            autosize: true,
+            width: 600,
+            height: 600,
+            scene: {
+                xaxis: { title: 'Red' },
+                yaxis: { title: 'Green' },
+                zaxis: { title: 'Blue' }
+            }
+        };
+        Plotly.newPlot('plot-container', data, layout);
+    });
 </script>

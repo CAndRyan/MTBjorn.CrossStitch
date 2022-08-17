@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MTBjorn.CrossStitch.Business.Helpers;
 using MTBjorn.CrossStitch.Visualize.Models;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace MTBjorn.CrossStitch.Visualize.Controllers
@@ -15,7 +17,11 @@ namespace MTBjorn.CrossStitch.Visualize.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var diagnosticsFilePath = @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json";
+            var diagnostics = System.IO.File.ReadAllText(diagnosticsFilePath);
+            //RebalanceHistory = JsonConvert.DeserializeObject<RebalanceHistory>(Diagnostics);
+
+            return View("index", diagnostics);
         }
 
         public IActionResult Privacy()
