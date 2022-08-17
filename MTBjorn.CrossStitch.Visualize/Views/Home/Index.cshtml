@@ -17,7 +17,7 @@
 <script defer>
     document.addEventListener("DOMContentLoaded", function () {
         const diagnostics = JSON.parse('@Html.Raw(Model)');
-        const data = diagnostics.Centroids.map((group, index) => ({
+        const centroidData = diagnostics.Centroids.map((group, index) => ({
             x: group.map(p => p.R),
             y: group.map(p => p.G),
             z: group.map(p => p.B),
@@ -28,18 +28,30 @@
             },
             type: 'scatter3d'
         }));
+        const pixelData = {
+            x: diagnostics.Pixels.map((pixelInfo) => pixelInfo.Pixel.R),
+            y: diagnostics.Pixels.map((pixelInfo) => pixelInfo.Pixel.G),
+            z: diagnostics.Pixels.map((pixelInfo) => pixelInfo.Pixel.B),
+            name: 'Pixels',
+            mode: 'markers',
+            marker: {
+                size: 2
+            },
+            type: 'scatter3d'
+        };
+        const traces = [ ...centroidData, pixelData ];
         const layout = {
             title: 'Centroids',
             showlegend: true,
             autosize: true,
-            width: 600,
-            height: 600,
+            width: 800,
+            height: 800,
             scene: {
                 xaxis: { title: 'Red' },
                 yaxis: { title: 'Green' },
                 zaxis: { title: 'Blue' }
             }
         };
-        Plotly.newPlot('plot-container', data, layout);
+        Plotly.newPlot('plot-container', traces, layout);
     });
 </script>
