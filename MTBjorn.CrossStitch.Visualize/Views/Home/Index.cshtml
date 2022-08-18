@@ -17,7 +17,7 @@
 <script defer>
     document.addEventListener("DOMContentLoaded", function () {
         const diagnostics = JSON.parse('@Html.Raw(Model)');
-        const centroidData = diagnostics.Centroids.map((group, index) => ({
+        const centroidGroupData = diagnostics.Centroids.map((group, index) => ({
             x: group.map(p => p.R),
             y: group.map(p => p.G),
             z: group.map(p => p.B),
@@ -28,7 +28,18 @@
             },
             type: 'scatter3d'
         }));
-        const groups = new Array(centroidData.length);
+        const centroidData = diagnostics.Centroids.map((group, index) => ({
+            x: [group[group.length - 1].R],
+            y: [group[group.length - 1].G],
+            z: [group[group.length - 1].B],
+            name: `Centroid (group ${index})`,
+            mode: 'markers',
+            marker: {
+                size: 6
+            },
+            type: 'scatter3d'
+        }));
+        const groups = new Array(centroidGroupData.length);
         for (let i = 0; i < groups.length; i++) {
             groups[i] = [];
         }
@@ -58,7 +69,7 @@
         //    },
         //    type: 'scatter3d'
         //};
-        const traces = [...centroidData, ...pixelGroupData];
+        const traces = [ ...centroidData, ...centroidGroupData, ...pixelGroupData ];
         const layout = {
             title: 'Centroids',
             showlegend: true,
