@@ -17,28 +17,36 @@
 <script defer>
     document.addEventListener("DOMContentLoaded", function () {
         const diagnostics = JSON.parse('@Html.Raw(Model)');
-        const centroidGroupData = diagnostics.Centroids.map((group, index) => ({
-            x: group.map(p => p.R),
-            y: group.map(p => p.G),
-            z: group.map(p => p.B),
-            name: `Group ${index}`,
-            mode: 'markers',
-            marker: {
-                size: 4
-            },
-            type: 'scatter3d'
-        }));
-        const centroidData = diagnostics.Centroids.map((group, index) => ({
-            x: [group[group.length - 1].R],
-            y: [group[group.length - 1].G],
-            z: [group[group.length - 1].B],
-            name: `Centroid (group ${index})`,
-            mode: 'markers',
-            marker: {
-                size: 6
-            },
-            type: 'scatter3d'
-        }));
+        const centroidGroupData = diagnostics.Centroids.map((group, index) => {
+            var finalCentroid = group[group.length - 1];
+            return {
+                x: group.map(p => p.R),
+                y: group.map(p => p.G),
+                z: group.map(p => p.B),
+                name: `Group ${index}`,
+                mode: 'markers',
+                marker: {
+                    size: 4,
+                    color: `rgb(${finalCentroid.R}, ${finalCentroid.G}, ${finalCentroid.B})`
+                },
+                type: 'scatter3d'
+            };
+        });
+        const centroidData = diagnostics.Centroids.map((group, index) => {
+            var finalCentroid = group[group.length - 1];
+            return {
+                x: [finalCentroid.R],
+                y: [finalCentroid.G],
+                z: [finalCentroid.B],
+                name: `Centroid (group ${index})`,
+                mode: 'markers',
+                marker: {
+                    size: 6,
+                    color: `rgb(${finalCentroid.R}, ${finalCentroid.G}, ${finalCentroid.B})`
+                },
+                type: 'scatter3d'
+            };
+        });
         const groups = new Array(centroidGroupData.length);
         for (let i = 0; i < groups.length; i++) {
             groups[i] = [];
