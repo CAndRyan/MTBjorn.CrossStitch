@@ -77,43 +77,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		private static List<List<Rgb24>> GetGroupsAroundNFurthestPoints(List<Rgb24> pixels, int numberOfPoints)
 		{
 			var correlationMatrix = GetDistanceCorrelationMatrix(pixels);
-
-			var greatestDistance = -1.0d;
-			var initialReferenceIndices = new int[2];
-			for (var col = 0; col < pixels.Count; col++)
-			{
-				for (var row = col; row < pixels.Count; row++)
-				{
-					var distance = Math.Abs(correlationMatrix[col, row]);
-					if (distance > greatestDistance)
-					{
-						greatestDistance = distance;
-						initialReferenceIndices[0] = col;
-						initialReferenceIndices[1] = row;
-					}
-				}
-			}
-			var referenceIndices = new List<int>(initialReferenceIndices);
-
-			while (referenceIndices.Count < numberOfPoints)
-			{
-				var greatestConsolidatedDistance = -1.0d;
-				var currentReferenceIndex = -1;
-				foreach (var index in Enumerable.Range(0, pixels.Count).Except(referenceIndices))
-				{
-					var distanceFromFirstReference = Math.Abs(correlationMatrix[index, referenceIndices[0]]);
-					var distanceFromSecondReference = Math.Abs(correlationMatrix[index, referenceIndices[1]]);
-					var consolidatedDistance = distanceFromFirstReference + distanceFromSecondReference;
-
-					if (consolidatedDistance >= greatestConsolidatedDistance)
-					{
-						greatestConsolidatedDistance = consolidatedDistance;
-						currentReferenceIndex = index;
-					}
-				}
-				referenceIndices.Add(currentReferenceIndex);
-			}
-
+			var referenceIndices = GetReferenceIndexes(pixels, correlationMatrix, numberOfPoints);
 			var groupMap = referenceIndices.ToDictionary(r => r, r => new List<Rgb24>
 			{
 				pixels[r]
@@ -134,6 +98,57 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			}
 
 			return groupMap.Values.ToList();
+		}
+
+        // TODO: correct the algorithm so the consolidated distance accounts for ALL prior references, not just the first 2
+        private static List<int> GetReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix, int numberOfPoints)
+		{
+			var referenceIndices = GetInitialReferenceIndexes(pixels, correlationMatrix).ToList();
+
+			while (referenceIndices.Count < numberOfPoints)
+			{
+				var greatestConsolidatedDistance = -1.0d;
+				var currentReferenceIndex = -1;
+
+				foreach (var index in Enumerable.Range(0, pixels.Count).Except(referenceIndices))
+				{
+					var distanceFromFirstReference = Math.Abs(correlationMatrix[index, referenceIndices[0]]);
+					var distanceFromSecondReference = Math.Abs(correlationMatrix[index, referenceIndices[1]]);
+					var consolidatedDistance = distanceFromFirstReference + distanceFromSecondReference;
+
+					if (consolidatedDistance >= greatestConsolidatedDistance)
+					{
+						greatestConsolidatedDistance = consolidatedDistance;
+						currentReferenceIndex = index;
+					}
+				}
+
+				referenceIndices.Add(currentReferenceIndex);
+			}
+
+			return referenceIndices;
+		}
+
+		private static int[] GetInitialReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix)
+		{
+			var greatestDistance = -1.0d;
+			var initialReferenceIndices = new int[2];
+
+			for (var col = 0; col < pixels.Count; col++)
+			{
+				for (var row = col; row < pixels.Count; row++)
+				{
+					var distance = Math.Abs(correlationMatrix[col, row]);
+					if (distance > greatestDistance)
+					{
+						greatestDistance = distance;
+						initialReferenceIndices[0] = col;
+						initialReferenceIndices[1] = row;
+					}
+				}
+			}
+
+			return initialReferenceIndices;
 		}
 
 		private static List<Rgb24> TwoColorAlgorithm(List<Rgb24> pixels)
@@ -376,7 +391,9 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			for (var i = 0; i < pixels.Count; i++)
 			{
 				var currentPixel = pixels[i];
-				for (var j = 0; j < i; j++)
+
+                // "walk" behind the first iterator of the pixel array, measuring distance between each prior pixel  & 'currentPixel', skipping a comparison of 'currentPixel' to itself
+                for (var j = 0; j < i; j++)
 				{
 					var rawDistance = GetDistance(currentPixel, pixels[j]);
 					matrix[j, i] = rawDistance;
