@@ -101,32 +101,32 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		}
 
         // TODO: correct the algorithm so the consolidated distance accounts for ALL prior references, not just the first 2
+		// compute the distance from each current reference, find greatest & select which pixel is furthest from at least 1 of them
         private static List<int> GetReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix, int numberOfPoints)
 		{
-			var referenceIndices = GetInitialReferenceIndexes(pixels, correlationMatrix).ToList();
+			var referenceIndexes = GetInitialReferenceIndexes(pixels, correlationMatrix).ToList();
 
-			while (referenceIndices.Count < numberOfPoints)
-			{
-				var greatestConsolidatedDistance = -1.0d;
-				var currentReferenceIndex = -1;
+			while (referenceIndexes.Count < numberOfPoints)
+				referenceIndexes.Add(FindPixelFurthestFromAllReferenceIndexes(pixels, correlationMatrix, referenceIndexes));
 
-				foreach (var index in Enumerable.Range(0, pixels.Count).Except(referenceIndices))
+			return referenceIndexes;
+		}
+
+		// i.e. maximize the closest distance each pixel is from each reference index
+		// the final selection is as far away from each reference as possible, without being too close to any other references indexes... in theory
+		// try using the average distance from each reference...?
+		private static int FindPixelFurthestFromAllReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix, IEnumerable<int> referenceIndexes)
+		{
+			return pixels
+				.Select((p, i) =>
 				{
-					var distanceFromFirstReference = Math.Abs(correlationMatrix[index, referenceIndices[0]]);
-					var distanceFromSecondReference = Math.Abs(correlationMatrix[index, referenceIndices[1]]);
-					var consolidatedDistance = distanceFromFirstReference + distanceFromSecondReference;
+					if (referenceIndexes.Contains(i))
+						return (i, 0);
 
-					if (consolidatedDistance >= greatestConsolidatedDistance)
-					{
-						greatestConsolidatedDistance = consolidatedDistance;
-						currentReferenceIndex = index;
-					}
-				}
-
-				referenceIndices.Add(currentReferenceIndex);
-			}
-
-			return referenceIndices;
+					return (PixelIndex: i, AverageDistance: referenceIndexes.Select(r => Math.Abs(correlationMatrix[r, i])).Average());
+				})
+				.OrderByDescending(t => t.AverageDistance)
+				.First().PixelIndex;
 		}
 
 		private static int[] GetInitialReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix)
@@ -207,7 +207,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 
 		private static List<List<Rgb24>> RebalanceIterativeWithDiagnostics(List<List<Rgb24>> groupings, string diagnosticsFilePath = @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json")
 		{
-			const int maxIterations = 100;
+			const int maxIterations = 3;
 
 			var balancedGroups = groupings;
 			var aPixelShifted = true;
