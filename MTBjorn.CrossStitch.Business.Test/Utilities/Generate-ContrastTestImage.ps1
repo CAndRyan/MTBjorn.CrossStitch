@@ -41,9 +41,10 @@ $redBlueCutoff = New-Object PSCustomObject -Property @{ r=150; g=0; b=75; } # go
 $redGreenCutoff = New-Object PSCustomObject -Property @{ r=150; g=75; b=0; } # go more to green by 41
 $redPure = New-Object PSCustomObject -Property @{ r=255; g=0; b=0; } # go more blue by 7 and green by 8
 
-$blueGroup = New-Object System.Collections.Generic.List[PSCustomObject];
-$greenGroup = New-Object System.Collections.Generic.List[PSCustomObject];
-$redGroup = New-Object System.Collections.Generic.List[PSCustomObject]; $blueGroup.Add($redPure)
+$blueGroup = New-Object System.Collections.Generic.List[PSCustomObject]
+$greenGroup = New-Object System.Collections.Generic.List[PSCustomObject]
+$redGroup = New-Object System.Collections.Generic.List[PSCustomObject]
+$redGroup.Add($redPure)
 
 for ($i = 0; $i -lt 41; $i++) {
 	$blueGroup.Add($( New-Object PSCustomObject -Property @{ r=$redBlueCutoff.r; g=$redBlueCutoff.g; b=($redBlueCutoff.b + $i); } ))
