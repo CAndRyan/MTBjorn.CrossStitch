@@ -85,7 +85,7 @@ if ($redGroup.Count -ne 98) {
 
 # Draw image as grid of 10x10 plots for each color -- use 2 columns of red shades, and one each for blue & green
 # NOTE: to draw a rectangle, specify the top-left and bottom-right coordinates as (x,y) where y is from the top
-$outputFile = "..\Resources\contrast-test-image.png"
+$outputFile = "..\Resources\contrast-test\contrast-test-image.png"
 $baseCommand = "& magick.exe convert -size 40x245 xc:white"
 $drawCommands = New-Object System.Collections.Generic.List[string]
 
