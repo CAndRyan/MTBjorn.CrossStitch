@@ -100,9 +100,9 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			return groupMap.Values.ToList();
 		}
 
-        // TODO: correct the algorithm so the consolidated distance accounts for ALL prior references, not just the first 2
+		// TODO: correct the algorithm so the consolidated distance accounts for ALL prior references, not just the first 2
 		// compute the distance from each current reference, find greatest & select which pixel is furthest from at least 1 of them
-        private static List<int> GetReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix, int numberOfPoints)
+		private static List<int> GetReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix, int numberOfPoints)
 		{
 			var referenceIndexes = GetInitialReferenceIndexes(pixels, correlationMatrix).ToList();
 
@@ -118,7 +118,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 		private static int FindPixelFurthestFromAllReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix, IEnumerable<int> referenceIndexes)
 		{
 			return pixels
-				.Select((p, i) =>
+				.Select((_, i) =>
 				{
 					if (referenceIndexes.Contains(i))
 						return (i, 0);
@@ -247,9 +247,9 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			//var pixelsThatMovedAtLeastSeptise = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 7).Select(h => h.pixel).ToList();
 
 			var rebalanceHistory = new RebalanceHistory
-            {
+			{
 				Pixels = pixelColorGroupHistory.Values.Select(h => new PixelHistory
-                {
+				{
 					Pixel = new Rgb24
 					{
 						R = h.pixel.R,
@@ -274,12 +274,12 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			return balancedGroups;
 		}
 
-        private static List<List<Rgb24>> Rebalance(List<List<Rgb24>> groupings, out bool aPixelShifted) // TODO: determine how to clean up the data from each iteration. The large test case starts at 2.4GB & increases as much with each iterations, suggesting the data is duplicated in memory without any cleanup...
+		private static List<List<Rgb24>> Rebalance(List<List<Rgb24>> groupings, out bool aPixelShifted) // TODO: determine how to clean up the data from each iteration. The large test case starts at 2.4GB & increases as much with each iterations, suggesting the data is duplicated in memory without any cleanup...
 		{
 			var centroids = groupings.Select(g => g.GetCentroid());
 			var pixels = groupings.SelectMany(g => g).ToList();
 			var correlationMatrix = GetDistanceCorrelationMatrix(centroids.Concat(pixels).ToList());
-			var newGroups = GetInitializeGroupList(groupings.Count);
+			var newGroups = GetInitializedGroupList(groupings.Count);
 			aPixelShifted = false;
 
 			for (var pixelIndex = 0; pixelIndex < pixels.Count; pixelIndex++)
@@ -305,7 +305,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			return newGroups.ToList();
 		}
 
-		private static List<Rgb24>[] GetInitializeGroupList(int groupCount)
+		private static List<Rgb24>[] GetInitializedGroupList(int groupCount)
 		{
 			var groups = new List<Rgb24>[groupCount];
 			for (var i = 0; i < groupCount; i++)
@@ -392,8 +392,8 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			{
 				var currentPixel = pixels[i];
 
-                // "walk" behind the first iterator of the pixel array, measuring distance between each prior pixel  & 'currentPixel', skipping a comparison of 'currentPixel' to itself
-                for (var j = 0; j < i; j++)
+				// "walk" behind the first iterator of the pixel array, measuring distance between each prior pixel  & 'currentPixel', skipping a comparison of 'currentPixel' to itself
+				for (var j = 0; j < i; j++)
 				{
 					var rawDistance = GetDistance(currentPixel, pixels[j]);
 					matrix[j, i] = rawDistance;
