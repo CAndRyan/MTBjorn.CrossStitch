@@ -1,5 +1,5 @@
 #
-# Generate an image for testing contrast preservation from color reductoin algorithms
+# Generate an image for testing contrast preservation from color reduction algorithms
 # Attempt to reduce an image with 98 shades of red, with 1 shade each of blue & green to 3 colors
 #
 
@@ -51,8 +51,8 @@ for ($i = 0; $i -lt 41; $i++) {
 	$greenGroup.Add($( New-Object PSCustomObject -Property @{ r=$redGreenCutoff.r; g=($redGreenCutoff.g + $i); b=$redGreenCutoff.b; } ))
 
 	if ($i -lt 7) {
-		$redGroup.Add($( New-Object PSCustomObject -Property @{ r=$redPure.r; g=($redPure.g + ($i * 8)); b=$redPure.b; } ))
-		$redGroup.Add($( New-Object PSCustomObject -Property @{ r=$redPure.r; g=$redPure.g; b=($redPure.b + ($i * 8)); } ))
+		$redGroup.Add($( New-Object PSCustomObject -Property @{ r=$redPure.r; g=($redPure.g + (($i + 1) * 8)); b=$redPure.b; } ))
+		$redGroup.Add($( New-Object PSCustomObject -Property @{ r=$redPure.r; g=$redPure.g; b=($redPure.b + (($i + 1) * 8)); } ))
 	}
 }
 $redGroup.Add($( New-Object PSCustomObject -Property @{ r=$redPure.r; g=($redPure.g + (8 * 8)); b=$redPure.b; } ))
@@ -86,7 +86,7 @@ if ($redGroup.Count -ne 98) {
 # Draw image as grid of 10x10 plots for each color -- use 2 columns of red shades, and one each for blue & green
 # NOTE: to draw a rectangle, specify the top-left and bottom-right coordinates as (x,y) where y is from the top
 $outputFile = "..\Resources\contrast-test\contrast-test-image.png"
-$baseCommand = "& magick.exe convert -size 40x245 xc:white"
+$baseCommand = "& magick.exe convert -size 40x490 xc:white"
 $drawCommands = New-Object System.Collections.Generic.List[string]
 
 for ($i = 0; $i -lt 49; $i++) {
@@ -97,8 +97,8 @@ for ($i = 0; $i -lt 49; $i++) {
 	$drawCommands.Add($(Get-RectangleDrawCommand $leftColor 0 $yCoord 10 10))
 	$drawCommands.Add($(Get-RectangleDrawCommand $rightColor 10 $yCoord 10 10))
 }
-$drawCommands.Add($(Get-RectangleDrawCommand $greenShade 20 0 245 10))
-$drawCommands.Add($(Get-RectangleDrawCommand $blueShade 30 0 245 10))
+$drawCommands.Add($(Get-RectangleDrawCommand $greenShade 20 0 490 10))
+$drawCommands.Add($(Get-RectangleDrawCommand $blueShade 30 0 490 10))
 
 $drawCommandsString = [System.String]::Join(" ", $drawCommands)
 $command = "$baseCommand $drawCommandsString $outputFile"

@@ -61,7 +61,7 @@ namespace MTBjorn.CrossStitch.Business.Image
 			var image = ImageFileIO.LoadImage<TPixel>(inputFilePath);
 			var (width, height) = AidaClothHelper.GetPixelDimensions(image, maxWidth, maxHeight, pointsPerInch);
 
-			ImageResizer.Resize(image, width, height);
+			//ImageResizer.Resize(image, width, height);
 
 			return image;
 		}

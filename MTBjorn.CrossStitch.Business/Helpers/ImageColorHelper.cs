@@ -22,6 +22,8 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 					colorMap.Add(pixelHash, pixel);
 			}
 
+			var strings = colorMap.Values.Cast<Rgb24>().OrderByDescending(p => p.R).Select(p => p.ToString()).ToList();
+
 			return colorMap.Values.ToList();
 		}
 
@@ -205,7 +207,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			return balancedGroups;
 		}
 
-		private static List<List<Rgb24>> RebalanceIterativeWithDiagnostics(List<List<Rgb24>> groupings, string diagnosticsFilePath = @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json")
+		private static List<List<Rgb24>> RebalanceIterativeWithDiagnostics(List<List<Rgb24>> groupings, string diagnosticsFilePath = @"D:\Chris\Projects\MTBjorn.CrossStitch\MTBjorn.CrossStitch.Business.Test\Resources\contrast-test\contrast-test-image-3colors-reduction-diagnostics.json")
 		{
 			const int maxIterations = 3;
 

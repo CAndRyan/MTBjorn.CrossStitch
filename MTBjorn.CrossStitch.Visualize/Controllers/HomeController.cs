@@ -17,7 +17,7 @@ namespace MTBjorn.CrossStitch.Visualize.Controllers
 
         public IActionResult Index()
         {
-            var diagnosticsFilePath = @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json"; // @"D:\Chris\Downloads\cross-stitch-test-diagnostics_1.json"; // @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json";
+            var diagnosticsFilePath = @"D:\Chris\Projects\MTBjorn.CrossStitch\MTBjorn.CrossStitch.Business.Test\Resources\contrast-test\contrast-test-image-3colors-reduction-diagnostics.json"; // @"D:\Chris\Downloads\cross-stitch-test-diagnostics_1.json"; // @"D:\Chris\Downloads\cross-stitch-test-diagnostics.json";
             var diagnostics = System.IO.File.ReadAllText(diagnosticsFilePath);
             //RebalanceHistory = JsonConvert.DeserializeObject<RebalanceHistory>(Diagnostics);
 
