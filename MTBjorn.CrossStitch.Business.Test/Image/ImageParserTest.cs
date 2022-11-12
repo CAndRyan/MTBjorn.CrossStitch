@@ -17,7 +17,7 @@ namespace MTBjorn.CrossStitch.Business.Test.Image
 			//sut.DO(Global.TestPngFilePath, "D:\\chris\\downloads\\crossStitchExample.png", 4);
 
 			var sut = new ImageParser(14.4, 11.8, 14);
-			sut.DO(@"D:\Chris\Projects\MTBjorn.CrossStitch\MTBjorn.CrossStitch.Business.Test\Resources\contrast-test\contrast-test-image.png", @"D:\Chris\Projects\MTBjorn.CrossStitch\MTBjorn.CrossStitch.Business.Test\Resources\contrast-test\contrast-test-image_3colors.png", 3);
+			sut.DO(@"D:\Chris\Projects\MTBjorn.CrossStitch\MTBjorn.CrossStitch.Business.Test\Resources\contrast-test\contrast-test-image.png", @"D:\Chris\Projects\MTBjorn.CrossStitch\MTBjorn.CrossStitch.Business.Test\Resources\contrast-test\contrast-test-image_3colors-weighted.png", 3);
 			//sut.DO(@"D:\Chris\Downloads\CS_TEST_SHARPEN.png", @"D:\Chris\Downloads\CS_TEST_SHARPEN_OUT.png", 15);
 
 			// TODO: figure out how my change in original image generation broke the green...

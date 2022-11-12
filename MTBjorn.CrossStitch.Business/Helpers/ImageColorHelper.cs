@@ -22,7 +22,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 					colorMap.Add(pixelHash, pixel);
 			}
 
-			var strings = colorMap.Values.Cast<Rgb24>().OrderByDescending(p => p.R).Select(p => p.ToString()).ToList();
+			//var strings = colorMap.Values.Cast<Rgb24>().OrderByDescending(p => p.R).Select(p => p.ToString()).ToList();
 
 			return colorMap.Values.ToList();
 		}
@@ -102,8 +102,6 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			return groupMap.Values.ToList();
 		}
 
-		// TODO: correct the algorithm so the consolidated distance accounts for ALL prior references, not just the first 2
-		// compute the distance from each current reference, find greatest & select which pixel is furthest from at least 1 of them
 		private static List<int> GetReferenceIndexes(List<Rgb24> pixels, double[,] correlationMatrix, int numberOfPoints)
 		{
 			var referenceIndexes = GetInitialReferenceIndexes(pixels, correlationMatrix).ToList();

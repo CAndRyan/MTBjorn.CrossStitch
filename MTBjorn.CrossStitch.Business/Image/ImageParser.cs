@@ -36,8 +36,8 @@ namespace MTBjorn.CrossStitch.Business.Image
 		public void DO(string inputFilePath, string outputFilePath, int numberOfColors)
 		{
 			var resizedImage = ResizeToClothDimensions<Rgb24>(inputFilePath);
-			var allColors = ImageColorHelper.GetAllColors(resizedImage);
-			var reducedColorSet = ImageColorHelper.GetReducedColorSet(allColors, numberOfColors);
+			var allColors = WeightedImageColorHelper.GetAllColors(resizedImage);
+			var reducedColorSet = WeightedImageColorHelper.GetReducedColorSet<Rgb24>(allColors, numberOfColors);
 
 			AdjustColors(resizedImage, reducedColorSet);
 			ImageFileIO.Save(resizedImage, outputFilePath);
