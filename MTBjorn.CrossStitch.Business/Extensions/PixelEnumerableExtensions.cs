@@ -25,6 +25,8 @@ namespace MTBjorn.CrossStitch.Business.Extensions
 			return new Rgb24(redAverage, greenAverage, blueAverage);
 		}
 
+		public static Rgb24 GetCentroid(this IEnumerable<WeightedPixel<Rgb24>> pixels) => pixels.Select(p => p.Value).GetCentroid();
+
 		/// <summary>
 		/// Essentially a "weighted centroid" where the "mass" of each pixel is their prescribed weight, pulling the center of each color component towards them
 		/// TODO: consider adding a sub-weight to each component to facilitate a red shift (or blue/green)

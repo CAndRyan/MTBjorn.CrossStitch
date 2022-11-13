@@ -10,4 +10,9 @@ namespace MTBjorn.CrossStitch.Business.Helpers
         public bool Completed { get; set; }
         public string ElapsedTime { get; set; }
     }
+
+	public class WeightedRebalanceHistory : RebalanceHistory
+	{
+		public Rgb24[][] CentersOfMass { get; set; }
+	}
 }

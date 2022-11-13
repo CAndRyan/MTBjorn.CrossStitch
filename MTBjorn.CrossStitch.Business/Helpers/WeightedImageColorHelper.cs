@@ -186,9 +186,10 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			var aPixelShifted = true;
 			var numberOfIterations = 0;
 			var pixelColorGroupHistory = balancedGroups.Select((g, i) => (group: g, groupIndex: i))
-				.SelectMany(gi => gi.group.Select(p => (pixel: p, groupIndex: gi.groupIndex)))
+				.SelectMany(gi => gi.group.Select(p => (pixel: p.Value, groupIndex: gi.groupIndex)))
 				.ToDictionary(pi => pi.pixel.GetHashCode(), pi => (pixel: pi.pixel, groupIndices: new List<int> { pi.groupIndex }));
-			var groupCentroidHistory = balancedGroups.Select(g => new List<Rgb24> { g.GetCenterOfMass().Value }).ToList();
+			var groupCentroidHistory = balancedGroups.Select(g => new List<Rgb24> { g.GetCentroid() }).ToList();
+			var groupCenterOfMassHistory = balancedGroups.Select(g => new List<Rgb24> { g.GetCenterOfMass().Value }).ToList();
 			var stopWatch = new Stopwatch();
 
 			stopWatch.Start();
@@ -198,7 +199,7 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 				numberOfIterations++;
 
 				var pixelGroupData = balancedGroups.Select((g, i) => (group: g, groupIndex: i))
-					.SelectMany(gi => gi.group.Select(p => (pixel: p, groupIndex: gi.groupIndex)));
+					.SelectMany(gi => gi.group.Select(p => (pixel: p.Value, groupIndex: gi.groupIndex)));
 				foreach (var (pixel, groupIndex) in pixelGroupData)
 				{
 					var pixelHash = pixel.GetHashCode();
@@ -207,7 +208,10 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 				}
 
 				for (var i = 0; i < balancedGroups.Count; i++)
-					groupCentroidHistory[i].Add(balancedGroups[i].GetCenterOfMass().Value);
+				{
+					groupCentroidHistory[i].Add(balancedGroups[i].GetCentroid());
+					groupCenterOfMassHistory[i].Add(balancedGroups[i].GetCenterOfMass().Value);
+				}
 			}
 			stopWatch.Stop();
 
@@ -219,19 +223,25 @@ namespace MTBjorn.CrossStitch.Business.Helpers
 			//var pixelsThatMovedAtLeastSixise = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 6).Select(h => h.pixel).ToList();
 			//var pixelsThatMovedAtLeastSeptise = pixelColorGroupHistory.Values.Where(h => h.groupIndices.Count > 7).Select(h => h.pixel).ToList();
 
-			var rebalanceHistory = new RebalanceHistory
+			var rebalanceHistory = new WeightedRebalanceHistory
 			{
 				Pixels = pixelColorGroupHistory.Values.Select(h => new PixelHistory
 				{
 					Pixel = new Rgb24
 					{
-						R = h.pixel.Value.R,
-						G = h.pixel.Value.G,
-						B = h.pixel.Value.B
+						R = h.pixel.R,
+						G = h.pixel.G,
+						B = h.pixel.B
 					},
 					Groups = h.groupIndices
 				}).ToArray(),
 				Centroids = groupCentroidHistory.Select(g => g.Select(c => new Rgb24
+				{
+					R = c.R,
+					G = c.G,
+					B = c.B
+				}).ToArray()).ToArray(),
+				CentersOfMass = groupCenterOfMassHistory.Select(g => g.Select(c => new Rgb24
 				{
 					R = c.R,
 					G = c.G,
